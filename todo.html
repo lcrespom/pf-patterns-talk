@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>Functional ToDo App</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/snabbdom/0.6.3/snabbdom-patch.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/ramda/0.23.0/ramda.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+		crossorigin="anonymous">
+</head>
+<body style="margin: 1em">
+
+	<div id="todo-app"></div>
+
+<script>
+let { patch: render, h } = snabbdom;
+
+//-------------------- Framework --------------------
+
+function runNext(f) {
+	setTimeout(f(), 0);
+}
+
+function runComponent(component, domNode, props = {}, debug = '') {
+	let vnode = domNode;
+	let model = component.init(props);
+	let dispatch = (action) => runNext(_ => {
+		if (action.type == '__debug') {
+			model = action.model;
+		}
+		else {
+			model = component.update(model, action, dispatch);
+			if (debug)
+				window.yocto.debug[debug]._push(model);
+		}
+		vnode = render(vnode, component.view(model, dispatch));
+	});
+	vnode = render(vnode, component.view(model, dispatch));
+	if (debug)
+		prepareDebug(debug, model, dispatch);
+	return dispatch;
+}
+
+
+// -------------------- Debug support  --------------------
+
+function prepareDebug(key, initialModel, dispatch) {
+	window.yocto = window.yocto || { debug: {} };
+	window.yocto.debug[key] = new YoctoDebugger(dispatch);
+	window.yocto.debug[key]._push(initialModel);
+}
+
+class YoctoDebugger {
+
+	constructor(dispatch) {
+		this.dispatch = dispatch;
+		this.models = [];
+		this.pos = 0;
+	}
+
+	_push(model) {
+		this.models.push(model);
+		this.pos = this.models.length - 1;
+	}
+
+	_setModel() {
+		this.dispatch({ type: '__debug', model: this.models[this.pos]});
+	}
+
+	back(steps = 1) {
+		if (this.pos - steps < 0)
+			throw Error('Beyond initial state');
+		this.pos -= steps;
+		this._setModel();
+	}
+
+	forward(steps = 1) {
+		if (this.pos + steps >= this.models.length)
+			throw Error('Beyond final state');
+		this.pos += steps;
+		this._setModel();
+	}
+}
+
+
+//-------------------- App --------------------
+
+let ToDoComponent = {
+	init,
+	view,
+	update
+};
+
+let node = document.getElementById('todo-app');
+runComponent(ToDoComponent, node, {}, 'todo');
+
+
+function init() {
+	return {
+		input: '',
+		items: [],
+		filter: 'All'
+	};
+}
+
+function update(model, action) {
+	let newItem;
+	let newModel = R.merge(model);
+	let replaceInList = (list, oldElem, newElem) =>
+		list.map(item => item === oldElem ? newElem : item);
+	switch (action.type) {
+		case 'input':
+			return newModel({
+				input: action.text
+			});
+		case 'add':
+			newItem = { text: action.text, completed: false };
+			return newModel({
+				input: '',
+				items: model.items.concat(newItem)
+			});
+		case 'toggle':
+			let completed = !action.item.completed;
+			newItem = R.merge(action.item, { completed });
+			return newModel({
+				items: replaceInList(model.items, action.item, newItem)
+			});
+		case 'filter':
+			return newModel({ filter: action.filter });
+		default: return model;
+	}
+}
+
+
+
+function viewAddToDo(model, dispatch) {
+	return h('div', [
+		h('input', {
+			on: { change: evt => dispatch({ type: 'input', text: evt.target.value }) },
+			props: { value: model.input },
+			attrs: { autofocus: true }
+		}),
+		' ',
+		h('button', {
+			on: { click: _ => dispatch({ type: 'add', text: model.input }) }
+		}, 'Add')
+	]);
+}
+
+function viewListItems(items, dispatch) {
+	return h('ul', items.map(item =>
+		h('li', {
+			on: { click: _ => dispatch({ type: 'toggle', item }) },
+			style: {
+				textDecoration: item.completed ? 'line-through' : '',
+				cursor: 'pointer'
+			}
+		}, item.text)
+	));
+}
+
+function viewFilter(filter, dispatch) {
+
+	function link(txt, active) {
+		if (!active) return txt;
+		return h('a', {
+			attrs: { href: '#' + txt },
+			on: { click: _ => dispatch({ type: 'filter', filter: txt }) }
+		}, txt);
+	}
+
+	return h('p', [
+		h('b', 'Filter: '),
+		link('All', filter != 'All'),
+		' | ',
+		link('Pending', filter != 'Pending'),
+		' | ',
+		link('Done', filter != 'Done')
+	]);
+}
+
+function filterItems(items, filter) {
+	switch (filter) {
+		case 'All':
+			return items;
+		case 'Pending':
+			return items.filter(i => !i.completed);
+		case 'Done':
+			return items.filter(i => i.completed);
+	}
+}
+
+function view(model, dispatch) {
+	return h('div', [
+		h('h1', 'ToDo'),
+		viewAddToDo(model, dispatch),
+		viewListItems(filterItems(model.items, model.filter), dispatch),
+		viewFilter(model.filter, dispatch)
+	]);
+}
+</script>
+
+</body>
+
+</html>
