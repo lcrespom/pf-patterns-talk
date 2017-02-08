@@ -1,0 +1,22 @@
+{
+  "name": "pf-patterns-talk",
+  "version": "1.0.0",
+  "description": "Material for a talk titled \"Functional Patterns for everyday applications\"",
+  "scripts": {
+    "start": "http-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lcrespom/pf-patterns-talk.git"
+  },
+  "author": "Luis Crespo, lcrespom@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lcrespom/pf-patterns-talk/issues"
+  },
+  "homepage": "https://github.com/lcrespom/pf-patterns-talk",
+  "devDependencies": {
+    "eslint": "^3.15.0",
+    "http-server": "^0.9.0"
+  }
+}
