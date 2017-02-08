@@ -33,13 +33,24 @@
 			body {
 				background-color: #036;
 			}
+			ul.sparse {
+				margin-top: 1em;
+			}
+			ul.sparse > li {
+				margin-top: 1ex;
+			}
+			li > ul {
+				font-size: 80% !important;
+			}
 			a {
 				color: #55ACEE !important;
 			}
 			a:hover {
 				color: #66CCCC !important;
 			}
-			img.img-noeffects {
+			img.big-img {
+				transform: translate(0, 5%) scale(1.3);
+				border-radius: 5px;
 				margin: 0 !important;
 				box-shadow: inherit !important;
 				background: inherit !important;
@@ -106,7 +117,7 @@
 
 	<section>
 		<h2>FP review</h2>
-		<ul>
+		<ul class="sparse">
 			<li>We are now all convinced that FP is great</li>
 			<li>Side effects are bad</li>
 			<li>I/O is a side effect</li>
@@ -115,223 +126,57 @@
 	</section>
 
 	<section>
-		<div>
-			<img src="img/full-picture.png">
-		</div>
+		<img class="big-img" src="img/full-picture.png">
 	</section>
 
 	<section>
-		<h2>Commodore 64</h2>
-		<iframe width="640" height="480" src="https://www.youtube.com/embed/N0TfHkNpRNs?start=16" frameborder="0" allowfullscreen></iframe>
-	</section>
-
-	<section>
-		<h2>Commodore Amiga</h2>
-		<iframe width="853" height="480" src="https://www.youtube.com/embed/thnXzUFJnfQ?rel=0" frameborder="0" allowfullscreen></iframe>
-	</section>
-
-	<section>
-		<h2>PC - software mixing</h2>
-		<iframe width="640" height="480" src="https://www.youtube.com/embed/iJvKzNQFv1Q?start=14" frameborder="0" allowfullscreen></iframe>
-	</section>
-
-	<section>
-		<h2>VST Plugins</h2>
-		<iframe width="853" height="480" src="https://www.youtube.com/embed/SMujb2hmv_I?start=5" frameborder="0" allowfullscreen></iframe>
-	</section>
-
-	<section>
-		<h3 style="text-transform: inherit">http://caniuse.com/#feat=audio-api</h3>
-		<img class="stretch" src="img/caniuse.png">
-	</section>
-
-	<section>
-		<h2>Web Audio API</h2>
-		<div class="audio-node audio-node-dst" style="margin-bottom: -20px !important">
-			AudioContext
-		</div>
-		<br>
-		<span class="arrows">&darr;</span>
-		<span style="font-size: 70%">Creates</span>
-		<br>
-		<div class="audio-node audio-node-dst" style="margin-bottom: -20px !important">
-			AudioNode
-		</div>
-		<br>
-		<span class="arrows">&darr;<sub>*</sub>&nbsp;</span>
-		<span style="font-size: 70%">Has</span>
-		<br>
-		<div class="audio-node audio-node-dst" style="margin-top: -5px !important">
-			AudioParam
-		</div>
-		<!--
-		<ul>
-			<li>AudioContext</li>
-			<li>AudioNodes</li>
+		<h2>Solution</h2>
+		<ul class="sparse">
+			<li>Use a functional-oriented framework / runtime</li>
+			<li>Only the framework can do I/O</li>
+			<li>Application code remains 100% pure functional</li>
 		</ul>
-		-->
-	</section>
-
-	<section data-transition="fade">
-		<h2>Audio routing graph</h2>
-		<div class="audio-node audio-node-src">
-			Sources
-		</div>
-		<span class="arrows">&#8594;</span>
-		<div class="audio-node">
-			Effects
-		</div>
-		<span class="arrows">&#8594;</span>
-		<div class="audio-node audio-node-dst">
-			Destination
-		</div>
-	</section>
-
-	<section data-transition="fade">
-		<h2>Example</h2>
-		<div style="display: inline-block">
-			<div class="audio-node audio-node-src">
-				Oscillator 1
-			</div>
-			<span class="arrows" style="top: 50px">&#8600;</span>
-			<br><br>
-			<div class="audio-node audio-node-src">
-				Oscillator 2
-			</div>
-			<span class="arrows" style="top: -10px">&#8599;</span>
-		</div>
-		<div style="display: inline-block; position: relative; bottom: 100px">
-			<div class="audio-node">
-				Filter
-			</div>
-			<span class="arrows">&#8594;</span>
-			<div class="audio-node audio-node-dst">
-				Destination
-			</div>
-		</div>
 	</section>
 
 	<section>
-		<h2>Audio Nodes</h2>
-		<div style="display: inline-block; float: left; width: 50%">
-			<div class="outer-pill">
-				Audio Sources
-				<div class="inner-pill">
-					OscillatorNode
-				</div>
-				<div class="inner-pill">
-					AudioBuffer<br/>SourceNode
-				</div>
-				<div class="inner-pill">
-					MediaStream<br/>AudioSourceNode
-				</div>
-			</div>
-		</div>
-		<div style="display: inline-block; float: right; width: 50%">
-			<div class="outer-pill">
-				Effects
-				<div class="inner-pill">
-					BiquadFilterNode
-				</div>
-				<div class="inner-pill">
-					GainNode
-				</div>
-				<div class="inner-pill">
-					DelayNode
-				</div>
-				<div class="inner-pill">
-					StereoPannerNode
-				</div>
-				<div class="inner-pill">
-					ConvolverNode
-				</div>
-				<div class="inner-pill">
-					Etc...
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<section data-background="#084">
-		<p style="font-size: 200%">Live coding!</p>
-		<pre><code class="hljs javascript" data-trim contenteditable>
-// Create Audio Context and OscillatorNode, and connect them
-var ac = new AudioContext();
-var osc = ac.createOscillator();
-osc.connect(ac.destination);
-// Set the oscillator parameters
-osc.frequency.value = 150;
-osc.type = "sawtooth";
-// Play a sound for 2 seconds
-osc.start();
-osc.stop(ac.currentTime + 2);
-		</code></pre>
-	</section>
-
-	<section data-background="#0AA" class="light">
-		<img src="img/modulator.svg"
-			style="border: none; background-color: inherit; box-shadow: none">
-		<p><a href="https://lcrespom.github.io/synth/">Live Demo</a></p>
-		<p>Repo at <a href="https://github.com/lcrespom/Modulator">https://github.com/lcrespom/Modulator</a></p>
-		<p style="font-size: 80%">
-			<br>Logo Design by
-			<a href="mailto:querbach.marta@gmail.com">Marta Quer Bach</a>
-		</p>
-	</section>
-
-	<section data-state="synthlib-demo">
-		<h2 onclick="playSynthDemo()">SynthLib</h2>
-		<pre><code class="hljs javascript" data-trim contenteditable style="max-height: 600px">
-var ac = new AudioContext();
-var json = { /* Instrument JSON... */ };
-var instrument = new Modulator.Instrument(ac, json, 8);
-
-var ct = -1, lastNote = 0;
-var KB_NOTES = 'ZSXDCVGBHNJMQ2W3ER5T6Y7UI9O0P';
-var score = 'Y  WRTYTWO I Y  WRTYTWO I T  QERTRQO I T  QERTRQO P ';
-var notes = score.split('').map(function(k) {
-    return k != ' ' ? 36 + KB_NOTES.indexOf(k) : 0;
-});
-
-function tick() {
-    if (lastNote) instrument.noteOff(lastNote);
-    if (ct++ > score.length * 2) return;
-    var note = notes[ct % notes.length];
-    if (note > 0) instrument.noteOn(note);
-    lastNote = note;
-    setTimeout(tick, 180);
-}
-
-tick();
-		</code></pre>
+		<img class="big-img" src="img/restux.png">
 	</section>
 
 	<section>
-		<h1>Thank you</h1>
-		<div style="display:inline-block">
-			<br>
-			<div style="text-align: left">
-				<div style="border-radius: 10px; background-color: #55ACEE; padding: 10px;
-					display: inline-block; width: 80px; height: 80px">
-					<img src="img/TwitterLogo_white.png"
-						class="img-noeffects" style="width: 100px; height: 100px;">
-				</div>
-				<span style="position: relative; bottom: 25px; left: 20px">
-					<a href="https://twitter.com/lcrespom">@lcrespom</a>
-				</span>
-			</div>
-			<div style="text-align: left; margin-top: 30px">
-				<div style="border-radius: 10px; padding: 10px;
-					display: inline-block; width: 80px; height: 80px">
-					<img src="img/GitHub-Mark-Light-120px-plus.png"
-						class="img-noeffects" style="width: 100px; height: 100px;">
-				</div>
-				<span style="position: relative; bottom: 25px; left: 20px">
-					<a href="https://lcrespom.github.io">https://lcrespom.github.io</a>
-				</span>
-			</div>
-		</div>
-		<p><br>Contributions are welcome</p>
+		<img class="big-img" src="img/elm.png">
+	</section>
+
+	<section>
+		<h2>Redux</h2>
+		<ul class="sparse">
+			<li>Redux is a JavaScript implementation of the Elm architecture
+				<ul>
+					<li>Reduction in FP: take two or more values and create a new single value out of them</li>
+					<li>Thus, the update function is called the reducer: it creates a new model  from an action and previous model</li>
+				</ul>
+			</li>
+			<li>Redux is framework-neutral, but used mainly in combination with React</li>
+			<li>Other implementations of this pattern:
+				<ul>
+					<li>Vuex for Vue.js</li>
+					<li>ng-redux / ng2-redux for Angular</li>
+				</ul>
+			</li>
+			<li>Time-travel debugging
+				<ul>
+					<li>Vuex for Vue.js</li>
+					<li>ng-redux / ng2-redux for Angular</li>
+				</ul>
+			</li>
+		</ul>
+	</section>
+
+
+	<section>
+		<h1 style="font-size: 330%">How hard can it be?</h1>
+		<h2>Let's implement a simplified equivalent of Redux</h2>
+		<p><a href="/hello.html">Hello world</a></p>
+		<p><a href="/todo.html">ToDo App</a></p>
 	</section>
 
 <!-- ************************* Content end ************************* -->
